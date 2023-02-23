@@ -1,5 +1,5 @@
+import os
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.linalg import fractional_matrix_power
 
 
@@ -46,8 +46,8 @@ def setup(frame, vehicles, x, y, adj):
     W0 = np.random.randn(features.shape[1], n_h) * 0.01
     W1 = np.random.randn(n_h, n_y) * 0.01
 
-    H1 = gcn(adj, features, W0, diagonal_matrix)
-    H2 = gcn(adj, H1, W1, diagonal_matrix)
+    hidden1 = gcn(adj, features, W0, diagonal_matrix)
+    hidden2 = gcn(adj, hidden1, W1, diagonal_matrix)
 
-    return H2
+    return hidden2
 
