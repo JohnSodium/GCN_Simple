@@ -1,9 +1,5 @@
-import os
-import networkx as nx
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-import count_lc
 from scipy.linalg import fractional_matrix_power
 
 
@@ -11,7 +7,18 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
-def graph_convolution(frame, vehicles, x, y, adj):
+# Relu activation function
+def relu(x):
+    return np.maximum(0, x)
+
+
+def gcn(a, h, w, diag):
+    diagonal_half = fractional_matrix_power(diag, -0.5)
+    eq = diagonal_half.dot(a).dot(diagonal_half).dot(h).dot(w)
+    return relu(eq)
+
+
+def setup(frame, vehicles, x, y, adj):
     diagonal_matrix = [[0 for i in range(len(vehicles))] for j in range(len(vehicles))]
 
     features = []
@@ -20,7 +27,7 @@ def graph_convolution(frame, vehicles, x, y, adj):
     for i in range(len(x)):
         features.append([x[i], y[i]])
 
-    print(features)
+    features = np.array(features)
 
     # Create the diagonal matrix
     for i in range(len(adj)):
@@ -31,10 +38,16 @@ def graph_convolution(frame, vehicles, x, y, adj):
                 count += 1
         diagonal_matrix[i][i] = count
 
-    # D^(-1/2)
-    diagonal_half = fractional_matrix_power(diagonal_matrix, -0.5)
-    DADX = diagonal_half.dot(adj).dot(diagonal_half).dot(features)
-    print('DADX:\n', DADX)
+    # Initialize the weights
+    np.random.seed(12345)
+    n_h = 4     # Neurons in the hidden layer
+    n_y = 2     # Neurons in the output layer
 
-    return frame
+    W0 = np.random.randn(features.shape[1], n_h) * 0.01
+    W1 = np.random.randn(n_h, n_y) * 0.01
+
+    H1 = gcn(adj, features, W0, diagonal_matrix)
+    H2 = gcn(adj, H1, W1, diagonal_matrix)
+
+    return H2
 
