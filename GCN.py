@@ -1,4 +1,5 @@
 import os
+import math
 import numpy as np
 from scipy.linalg import fractional_matrix_power
 
@@ -38,9 +39,16 @@ def setup(frame, vehicles, x, y, adj):
                 count += 1
         diagonal_matrix[i][i] = count
 
+    for i in range(len(adj)):
+        for j in range(len(vehicles)):
+            if adj[i][j] == 1:
+                if i != j:
+                    distance = math.sqrt(((x[j] - x[i]) ** 2) + (y[j] - y[i]) ** 2)
+                    adj[i][j] = 1/distance
+
     # Initialize the weights
     np.random.seed(12345)
-    n_h = 4     # Neurons in the hidden layer
+    n_h = 9     # Neurons in the hidden layer.
     n_y = 2     # Neurons in the output layer
 
     W0 = np.random.randn(features.shape[1], n_h) * 0.01
@@ -50,4 +58,3 @@ def setup(frame, vehicles, x, y, adj):
     hidden2 = gcn(adj, hidden1, W1, diagonal_matrix)
 
     return hidden2
-
