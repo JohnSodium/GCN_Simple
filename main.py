@@ -10,7 +10,6 @@ node_data = None
 vehicle_count = 0
 spatial_features = []
 original_vehicles = []
-added_index = []
 
 ###### load data ######
 lc_frame = count_lc.get_Swap_Frame()    # Frames where lane changes occur
@@ -79,6 +78,9 @@ for i in range(0, 1):
             for k in temp_y:
                 y.append(float(k))
 
+            # print(original_vehicles)
+            # print(vehicle_list)
+
             originalptr = 0
             curptr = 0
             for k in range(len(original_vehicles)):
@@ -92,7 +94,6 @@ for i in range(0, 1):
                     x.insert(curptr, 0)
                     y.insert(curptr, 0)
                     adjacency.insert(curptr, [0 for i in range(len(vehicle_list))])
-                    added_index.append(curptr)
                     for l in range(len(vehicle_list)):
                         if len(adjacency[l]) != len(vehicle_list):
                             adjacency[l].insert(curptr, 0)
@@ -102,8 +103,7 @@ for i in range(0, 1):
 
             # Self Loop
             for k in range(len(adjacency)):
-                if k not in added_index:
-                    adjacency[k][k] = 1
+                adjacency[k][k] = 1
 
             result = GCN.setup(cur_frame, vehicle_list, x, y, adjacency)
             spatial_features.append(result)
