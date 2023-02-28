@@ -15,6 +15,7 @@ def relu(x):
 
 def gcn(a, h, w, diag):
     diagonal_half = fractional_matrix_power(diag, -0.5)
+    print(a)
     eq = diagonal_half.dot(a).dot(diagonal_half).dot(h).dot(w)
     return relu(eq)
 
@@ -48,13 +49,13 @@ def setup(frame, vehicles, x, y, adj):
 
     # Initialize the weights
     np.random.seed(12345)
-    n_h = 9     # Neurons in the hidden layer.
+    n_h = 2    # Neurons in the hidden layer.
     n_y = 2     # Neurons in the output layer
 
-    W0 = np.random.randn(features.shape[1], n_h) * 0.01
+    W0 = abs(np.random.randn(features.shape[1], n_h) * 0.01)
     W1 = np.random.randn(n_h, n_y) * 0.01
 
     hidden1 = gcn(adj, features, W0, diagonal_matrix)
-    hidden2 = gcn(adj, hidden1, W1, diagonal_matrix)
+    # hidden2 = gcn(adj, hidden1, W1, diagonal_matrix)
 
-    return hidden2
+    return hidden1
