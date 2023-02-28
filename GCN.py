@@ -15,7 +15,7 @@ def relu(x):
 
 def gcn(a, h, w, diag):
     diagonal_half = fractional_matrix_power(diag, -0.5)
-    print(a)
+    # print(diagonal_half.dot(a).dot(diagonal_half))
     eq = diagonal_half.dot(a).dot(diagonal_half).dot(h).dot(w)
     return relu(eq)
 
@@ -30,7 +30,6 @@ def setup(frame, vehicles, x, y, adj):
         features.append([x[i], y[i]])
 
     features = np.array(features)
-
     # Create the diagonal matrix
     for i in range(len(adj)):
         # Count 1 occurrences
@@ -44,6 +43,8 @@ def setup(frame, vehicles, x, y, adj):
         for j in range(len(vehicles)):
             if adj[i][j] == 1:
                 if i != j:
+                    if x[j] or x[i] or y[j] or y[i] == 0:
+                        adj[i][j] = 0
                     distance = math.sqrt(((x[j] - x[i]) ** 2) + (y[j] - y[i]) ** 2)
                     adj[i][j] = 1/distance
 
@@ -57,5 +58,11 @@ def setup(frame, vehicles, x, y, adj):
 
     hidden1 = gcn(adj, features, W0, diagonal_matrix)
     # hidden2 = gcn(adj, hidden1, W1, diagonal_matrix)
+
+#     print('########################')
+#     print(features)
+#     print('-------------------------')
+#     print(hidden1)
+#     print('########################')
 
     return hidden1
